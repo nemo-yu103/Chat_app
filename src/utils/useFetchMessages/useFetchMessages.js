@@ -2,7 +2,7 @@ import { useEffect, useRef } from "react";
 
 export const MESSAGE_FETCH_INTERVAL = 1500;
 
-const API_URL = 'http://localhost:3001';
+const API_URL = 'http://localhost:5000';
 
 const useChat = () => {
     const [messages, setMessages] = useState([]);
@@ -45,3 +45,5 @@ const useChat = () => {
         loading,
     }
 }
+
+export default useChat;
