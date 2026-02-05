@@ -12,20 +12,20 @@ const Chat = () => {
         },
     ]
 
-    const testDataMessages = [
-        {
-            text: 'msg1',
-            userid: 1,
-        },
-        {
-            text: 'msg2',
-            userid: 2,
-        },
-        {
-            text: 'msg3',
-            userid: 1,
-        },
-    ]
+  const testDataMessages = [
+    {
+      text: "msg1",
+      userid: 1,
+    },
+    {
+      text: "msg2",
+      userid: 2,
+    },
+    {
+      text: "msg3",
+      userid: 1,
+    },
+  ];
 
     const getUserName = (userId) => {
         const user = testDataUsers.find(u => u.id === userId);
@@ -38,6 +38,14 @@ const Chat = () => {
         alignItems: userId === currentUserId ? 'flex-end' : 'flex-start',
         marginBottom: '10px'
     });
+  
+    const getMessages = async () => {
+    const asd = await fetch("http://localhost:5000/messages/1", {
+      method: "GET",
+      headers: { "Content-Type": "application/json" },
+    });
+    console.log(asd);
+  };
 
     //---Styles---
     const styles = {
@@ -107,5 +115,6 @@ const Chat = () => {
         // </div>
     );
 }
+
 
 export default Chat;
