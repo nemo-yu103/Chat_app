@@ -1,3 +1,6 @@
+import React, { useState } from 'react';
+import './Chat.css';
+
 const Chat = () => {
     const currentUserId = 1;
 
@@ -12,20 +15,36 @@ const Chat = () => {
         },
     ]
 
-  const testDataMessages = [
-    {
-      text: "msg1",
-      userid: 1,
-    },
-    {
-      text: "msg2",
-      userid: 2,
-    },
-    {
-      text: "msg3",
-      userid: 1,
-    },
-  ];
+    const testDataMessages = [
+        {
+            text: "msg1",
+            userid: 1,
+        },
+        {
+            text: "msg2",
+            userid: 2,
+        },
+        {
+            text: "msg3",
+            userid: 1,
+        },
+    ];
+
+    const [messages, setMessages] = useState(testDataMessages);
+    const [inputText, setInputText] = useState('');
+
+    const handleSendMessage = () => {
+        if (!inputText.trim()) return;
+
+        const newMessage = {
+            text: inputText,
+            userid: 1, // This represents you
+        };
+
+        setMessages([...messages, newMessage]);
+        setInputText('');
+    };
+
 
     const getUserName = (userId) => {
         const user = testDataUsers.find(u => u.id === userId);
@@ -38,14 +57,14 @@ const Chat = () => {
         alignItems: userId === currentUserId ? 'flex-end' : 'flex-start',
         marginBottom: '10px'
     });
-  
+
     const getMessages = async () => {
-    const asd = await fetch("http://localhost:5000/messages/1", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" },
-    });
-    console.log(asd);
-  };
+        const asd = await fetch("http://localhost:5000/messages/1", {
+            method: "GET",
+            headers: { "Content-Type": "application/json" },
+        });
+        console.log(asd);
+    };
 
     //---Styles---
     const styles = {
@@ -84,7 +103,6 @@ const Chat = () => {
             <div style={{ marginTop: '20px' }}>
                 {testDataMessages.map((msg, index) => {
                     const isMe = msg.userid === currentUserId;
-                    // const name = getUserName(msg.userid, testDataUsers);
                     return (
                         <div key={index} style={getMessageStyle(msg.userid, currentUserId)}>
                             <span style={styles.userName}>
@@ -97,22 +115,17 @@ const Chat = () => {
                     );
                 })}
             </div>
+
+            <div className="input-section">
+                <input
+                    type="text"
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    placeholder="Type here..."
+                />
+                <button onClick={handleSendMessage}>Send</button>
+            </div>
         </div>
-        // <div style={{ padding: '20px', frontFamily: 'Arial' }}>
-        //     ChatRoom
-
-        //     {testDataMessages.map((msg, index) => {
-        //         const user = testDataUsers.find(
-        //             (u) => u.id === msg.userid
-        //         );
-
-        //         return (
-        //             <div key={index}>
-        //                 <strong>{user?.name}</strong> {msg.text}
-        //             </div>
-        //         );
-        //     })}
-        // </div>
     );
 }
 
