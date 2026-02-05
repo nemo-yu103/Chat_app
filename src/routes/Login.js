@@ -10,25 +10,23 @@ const Login = () => {
 
     const navigate = useNavigate();
 
-    const handleLogin = async() => {
+    const handleLogin = async () => {
         // ログイン処理のロジックをここに追加
         if (userename.trim() === "" || password.trim() === "") {
             setError("ユーザー名とパスワードを入力してください");
             return;
         }
-        
-        try
-        {
+
+        try {
             // サーバーにログインリクエストを送信
             const res = await fetch('http://localhost:5000/login', {
                 method: 'POST',
-                headers: {'Content-Type': 'application/json'},
-                body: JSON.stringify({username: userename, password: password}) 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: userename, password: password })
             });
 
             //404や500などのエラーステータスの場合
-            if (!res.ok)
-            {
+            if (!res.ok) {
                 setError("ユーザー名またはパスワードが正しくありません");
                 return;
             }
@@ -42,8 +40,7 @@ const Login = () => {
             }));
             navigate("/chat");
         }
-        catch(err)
-        {
+        catch (err) {
             setError("サーバーに接続できませんでした");
         }
 
@@ -52,28 +49,30 @@ const Login = () => {
 
     return (
         <>
-            <div className="login-box">
-                <h2 className = "title">ログインページ</h2>
+            <div className="login-page">
+                <div className="login-box">
+                    <h2 className="title">ログインページ</h2>
 
-                <input className ="imput"
-                    type="text"
-                    placeholder="ユーザー名"
-                    value={userename}
-                    onChange={(e) => setUsername(e.target.value)}
-                />
-                <br />
-                <input className ="imput"
-                    type="password"
-                    placeholder="パスワード"
-                    value={password}
-                    onChange={(e) => setPassword(e.target.value)}
-                />
+                    <input className="imput"
+                        type="text"
+                        placeholder="ユーザー名"
+                        value={userename}
+                        onChange={(e) => setUsername(e.target.value)}
+                    />
+                    <br />
+                    <input className="imput"
+                        type="password"
+                        placeholder="パスワード"
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                    />
 
-                <div className="button-Login">
-                    <button onClick={handleLogin}>ログイン</button>
+                    <div className="button-Login">
+                        <button onClick={handleLogin}>ログイン</button>
+                    </div>
+                    {error && <p style={{ color: 'red' }}>{error}</p>}
+
                 </div>
-                {error && <p style={{ color: 'red' }}>{error}</p>}
-
             </div>
         </>
     )
