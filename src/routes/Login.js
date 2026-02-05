@@ -50,7 +50,7 @@ const Login = () => {
 
     return (
         <>
-            <div>
+            <div className="login-box">
                 <h2 className = "title">ログインページ</h2>
 
                 <input className ="imput"
