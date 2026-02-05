@@ -19,6 +19,18 @@ const Chat = () => {
         return asd;
     };
 
+    const deleteMessage = async (index) => {
+        const asd = await fetch("http://localhost:5000/messages", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                msgId: index
+            })
+        });
+        console.log(asd)
+        // setMessages((prev) => prev.filter((_, i) => i !== index));
+    };
+
     useEffect(() => {
         (async () => {
             const res = await getMessages();
@@ -63,7 +75,8 @@ const Chat = () => {
         },
         time: {
             fontSize: '11px',
-            opacity: 0.7
+            opacity: 0.7,
+            alignSelf: 'flex-end'
         },
         messagesText: {
             marginBottom: '4px'
@@ -79,30 +92,33 @@ const Chat = () => {
                     return (
                         <div key={index} style={getMessageStyle(msg.userid, currentUserId)}>
 
-                         
+                            <span style={{
+                                ...styles.userName,
+                                textAlign: isMe ? 'right' : 'left',
+                                display: 'block'
+                            }}>
+                                {msg.username} <br />{new Date(msg.created_at).toLocaleDateString("en-CA")}
+                            </span>
 
-                                <span style={{
-                                    ...styles.userName,
-                                    textAlign: isMe ? 'right' : 'left',
-                                    display: 'block'
-                                }}>
-                                    {msg.username} <br />{new Date(msg.created_at).toLocaleDateString("en-CA")}
-                                </span>
+                            <span style={styles.bubble(isMe)}>
+                                <div style={styles.messagesText}>
+                                    {msg.text}
+                                </div>
 
-                                <span style={styles.bubble(isMe)}>
-                                    <div style={styles.messagesText}>
-                                        {msg.text}
-                                    </div>
-                            
                                 <div style={styles.time}>
                                     {new Date(msg.created_at).toLocaleTimeString([], {
                                         hour: '2-digit',
                                         minute: '2-digit'
                                     })}
                                 </div>
-                                </span>
-                            </div>
-                       
+                                {isMe && (
+                                    <button
+                                        onClick={() => deleteMessage(index)}>
+                                        Delet
+                                    </button>
+                                )}
+                            </span>
+                        </div>
                     );
                 })}
             </div>

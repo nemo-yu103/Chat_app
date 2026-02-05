@@ -54,6 +54,15 @@ const postMessage = async (userId, groupId, text) => {
         VALUES ("${text}", ${userId}, now(), ${groupId})
     `);
   return rows;
+}
+
+const deleteMessage = async (msgId) => {
+  const [rows] = await pool.execute(`
+        UPDATE messages
+        SET deleted_at = now()
+        WHERE id = ${msgId}
+    `);
+  return rows;
 };
 
 const app = express();
@@ -64,6 +73,19 @@ app.use(cors());
 
 app.get("/test", (req, res) => {
   res.send("test endpoint");
+});
+
+app.post("/messages", async (req, res) => {
+  try {
+    const { msgId } = req.body;
+    console.log('asdasd');
+    await deleteMessage(msgId);
+
+    res.status(200);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "DB error" });
+  }
 });
 
 app.post("/login", async (req, res) => {
