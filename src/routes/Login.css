@@ -1,0 +1,21 @@
+.title{
+    font-family: arial;
+    
+    margin: 25px;
+    width: 350px;
+    height: 200px;
+    outline: dashed 1px blacl;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+}
+
+.imput{
+    font-family: arial;
+    font-size: 18px;
+    margin: 10px;
+    width: 300px;
+    height: 40px;
+    outline: solid 1px gray;
+    text-align: center;
+}
