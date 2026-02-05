@@ -1,35 +1,9 @@
+import { useEffect, useState } from "react";
 import React, { useState } from 'react';
 import './Chat.css';
 
 const Chat = () => {
     const currentUserId = 1;
-
-    const testDataUsers = [
-        {
-            id: 1,
-            name: "nemoto",
-        },
-        {
-            id: 2,
-            name: "itou",
-        },
-    ]
-
-    const testDataMessages = [
-        {
-            text: "msg1",
-            userid: 1,
-        },
-        {
-            text: "msg2",
-            userid: 2,
-        },
-        {
-            text: "msg3",
-            userid: 1,
-        },
-    ];
-
     const [messages, setMessages] = useState(testDataMessages);
     const [inputText, setInputText] = useState('');
 
@@ -63,13 +37,22 @@ const Chat = () => {
             method: "GET",
             headers: { "Content-Type": "application/json" },
         });
-        console.log(asd);
+        return asd;
     };
+
+    useEffect(() => {
+        (async () => {
+            const res = await getMessages();
+            const data = await res.json();
+            setMessages(data);
+            console.log(data)
+        })()
+    }, [])
 
     //---Styles---
     const styles = {
         container: {
-            maxWidth: 'auto',
+            maxWidth: '400px auto',
             margin: '20px auto',
             border: '1px solid #ddd',
             borderRadius: '10px',
@@ -89,11 +72,22 @@ const Chat = () => {
             padding: '8px 12px',
             borderRadius: '15px',
             maxWidth: '80%',
-            marginTop: '4px'
+            marginTop: '4px',
+            display: 'flex',
+            flexDirection: 'column',
+            whiteSpace: 'pre-wrap',
+            wordBreak: 'break-word'
         }),
         userName: {
             fontSize: '12px',
             color: '#666'
+        },
+        time: {
+            fontSize: '11px',
+            opacity: 0.7
+        },
+        messagesText: {
+            marginBottom: '4px'
         }
     };
 
@@ -101,17 +95,35 @@ const Chat = () => {
         <div style={styles.container}>
             <h2 style={styles.header}>Chat Room</h2>
             <div style={{ marginTop: '20px' }}>
-                {testDataMessages.map((msg, index) => {
+                {messages.map((msg, index) => {
                     const isMe = msg.userid === currentUserId;
                     return (
                         <div key={index} style={getMessageStyle(msg.userid, currentUserId)}>
-                            <span style={styles.userName}>
-                                {getUserName(msg.userid)}
-                            </span>
-                            <div style={styles.bubble(isMe)}>
-                                {msg.text}
+
+                         
+
+                                <span style={{
+                                    ...styles.userName,
+                                    textAlign: isMe ? 'right' : 'left',
+                                    display: 'block'
+                                }}>
+                                    {msg.username} <br />{new Date(msg.created_at).toLocaleDateString("en-CA")}
+                                </span>
+
+                                <span style={styles.bubble(isMe)}>
+                                    <div style={styles.messagesText}>
+                                        {msg.text}
+                                    </div>
+                            
+                                <div style={styles.time}>
+                                    {new Date(msg.created_at).toLocaleTimeString([], {
+                                        hour: '2-digit',
+                                        minute: '2-digit'
+                                    })}
+                                </div>
+                                </span>
                             </div>
-                        </div>
+                       
                     );
                 })}
             </div>
