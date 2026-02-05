@@ -1,8 +1,29 @@
 import { useEffect, useState } from "react";
+import React, { useState } from 'react';
+import './Chat.css';
 
 const Chat = () => {
     const currentUserId = 1;
-    const [messages, setMessages] = useState([]);
+    const [messages, setMessages] = useState(testDataMessages);
+    const [inputText, setInputText] = useState('');
+
+    const handleSendMessage = () => {
+        if (!inputText.trim()) return;
+
+        const newMessage = {
+            text: inputText,
+            userid: 1, // This represents you
+        };
+
+        setMessages([...messages, newMessage]);
+        setInputText('');
+    };
+
+
+    const getUserName = (userId) => {
+        const user = testDataUsers.find(u => u.id === userId);
+        return user ? user.name : "Unknown";
+    };
 
     const getMessageStyle = (userId, currentUserId) => ({
         display: 'flex',
@@ -105,6 +126,16 @@ const Chat = () => {
                        
                     );
                 })}
+            </div>
+
+            <div className="input-section">
+                <input
+                    type="text"
+                    value={inputText}
+                    onChange={(e) => setInputText(e.target.value)}
+                    placeholder="Type here..."
+                />
+                <button onClick={handleSendMessage}>Send</button>
             </div>
         </div>
     );
