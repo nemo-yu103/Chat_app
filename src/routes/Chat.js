@@ -1,36 +1,35 @@
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import CreateGroup from "../components/CreateGroup";
+import "./Chat.css";
 
 const Chat = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [inputText, setInputText] = useState("");
 
   const currentUserId = 1;
 
   const testDataUsers = [
     {
       id: 1,
-      name: "nemoto",
+      name: "nemoto"
     },
     {
       id: 2,
-      name: "itou",
-    },
+      name: "itou"
+    }
   ];
 
-  const testDataMessages = [
-    {
-      text: "msg1",
-      userid: 1,
-    },
-    {
-      text: "msg2",
-      userid: 2,
-    },
-    {
-      text: "msg3",
-      userid: 1,
-    },
-  ];
+  const handleSendMessage = () => {
+    if (!inputText.trim()) return;
+
+    const newMessage = {
+      text: inputText,
+      userid: 1 // This represents you
+    };
+
+    setInputText("");
+  };
 
   const getUserName = (userId) => {
     const user = testDataUsers.find((u) => u.id === userId);
@@ -41,33 +40,41 @@ const Chat = () => {
     display: "flex",
     flexDirection: "column",
     alignItems: userId === currentUserId ? "flex-end" : "flex-start",
-    marginBottom: "10px",
+    marginBottom: "10px"
   });
 
   const getMessages = async () => {
     const asd = await fetch("http://localhost:5000/messages/1", {
       method: "GET",
-      headers: { "Content-Type": "application/json" },
+      headers: { "Content-Type": "application/json" }
     });
-    console.log(asd);
+    return asd;
   };
 
-  //---Styles---
+  useEffect(() => {
+    (async () => {
+      const res = await getMessages();
+      const data = await res.json();
+      setMessages(data);
+      console.log(data);
+    })();
+  }, []);
+
   const styles = {
     container: {
-      maxWidth: "auto",
+      maxWidth: "400px auto",
       margin: "20px auto",
       border: "1px solid #ddd",
       borderRadius: "10px",
       padding: "20px",
       backgroundColor: "#f9f9f9",
-      fontFamily: "sans-serif",
+      fontFamily: "sans-serif"
     },
     header: {
       textAlign: "center",
       color: "#333",
       borderBottom: "2px solid #eee",
-      paddingBottom: "10px",
+      paddingBottom: "10px"
     },
     bubble: (isMe) => ({
       backgroundColor: isMe ? "#0084ff" : "#e4e6eb",
@@ -76,28 +83,31 @@ const Chat = () => {
       borderRadius: "15px",
       maxWidth: "80%",
       marginTop: "4px",
+      display: "flex",
+      flexDirection: "column",
+      whiteSpace: "pre-wrap",
+      wordBreak: "break-word"
     }),
     userName: {
       fontSize: "12px",
-      color: "#666",
+      color: "#666"
     },
+    time: {
+      fontSize: "11px",
+      opacity: 0.7
+    },
+    messagesText: {
+      marginBottom: "4px"
+    }
   };
 
   return (
     <>
       <div style={styles.container}>
-        <button
-          onClick={() => {
-            setIsCreateModalOpen(true);
-          }}
-        >
-          create new group
-        </button>
         <h2 style={styles.header}>Chat Room</h2>
         <div style={{ marginTop: "20px" }}>
-          {testDataMessages.map((msg, index) => {
+          {messages.map((msg, index) => {
             const isMe = msg.userid === currentUserId;
-            // const name = getUserName(msg.userid, testDataUsers);
             return (
               <div
                 key={index}

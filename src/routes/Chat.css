@@ -1,0 +1,12 @@
+
+.chat-screen {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    height: 100vh;
+    background-color: #f0f2f5;
+}
+
+.input-section { padding: 15px; border-top: 1px solid #eee; display: flex; gap: 10px; }
+.input-section input { flex: 1; padding: 10px; border-radius: 20px; border: 1px solid #ddd; outline: none; }
+.input-section button { background: #0084ff; color: white; border: none; padding: 0 15px; border-radius: 20px; cursor: pointer; }
