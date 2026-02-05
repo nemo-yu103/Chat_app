@@ -56,6 +56,48 @@ const postMessage = async (userId, groupId, text) => {
   return rows;
 };
 
+const getUsers = async (userId) => {
+  const [rows] = await pool.execute(`
+        SELECT *
+        FROM users
+        WHERE users.id <> ${userId}
+    `);
+  return rows;
+};
+
+const createGroupWithUsers = async (groupName, userIds) => {
+  const connection = await pool.getConnection();
+  try {
+    await connection.beginTransaction();
+
+    const [groupResult] = await connection.execute(`
+        INSERT INTO message_groups (name)
+        VALUES (?)
+      `,
+      [groupName],
+    );
+    const groupId = groupResult.insertId;
+
+    if (Array.isArray(userIds) && userIds.length) {
+      const values = userIds.map((id) => [id, groupId]);
+      await connection.query(`
+          INSERT INTO users_to_groups (userid, groupid)
+          VALUES ?
+        `,
+        [values],
+      );
+    }
+
+    await connection.commit();
+    return { groupId };
+  } catch (err) {
+    await connection.rollback();
+    throw err;
+  } finally {
+    connection.release();
+  }
+};
+
 const app = express();
 
 app.use(express.static(path.join(__dirname, "public")));
@@ -109,6 +151,19 @@ app.get("/groups/:userId", async (req, res) => {
   }
 });
 
+// get all users except self for group creation purposes
+app.get("/users/:userId", async (req, res) => {
+  try {
+    const { userId } = req.params;
+    const rows = await getUsers(userId);
+
+    res.json(rows);
+  } catch (e) {
+    console.error(e);
+    res.status(500).json({ error: "DB error" });
+  }
+});
+
 app.post("/messages", async (req, res) => {
   try {
     const { text, groupId, userId } = req.body;
@@ -118,6 +173,23 @@ app.post("/messages", async (req, res) => {
   } catch (e) {
     console.error(e);
     res.status(500).json({ error: "DB error" });
+  }
+});
+
+app.post("/groups", async (req, res) => {
+  try {
+    const { groupName, userIds } = req.body;
+
+    const payloadUserIds = userIds.map((id) => Number(id));
+    const { groupId } = await createGroupWithUsers(
+      groupName,
+      payloadUserIds,
+    );
+
+    return res.status(201).json({ groupId });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ error: "DB error" });
   }
 });
 
