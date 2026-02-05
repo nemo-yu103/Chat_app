@@ -1,10 +1,9 @@
 import { useEffect, useState } from "react";
-import React, { useState } from 'react';
 import './Chat.css';
 
 const Chat = () => {
     const currentUserId = 1;
-    const [messages, setMessages] = useState(testDataMessages);
+    const [messages, setMessages] = useState([]);
     const [inputText, setInputText] = useState('');
 
     const handleSendMessage = () => {
@@ -20,10 +19,10 @@ const Chat = () => {
     };
 
 
-    const getUserName = (userId) => {
-        const user = testDataUsers.find(u => u.id === userId);
-        return user ? user.name : "Unknown";
-    };
+    // const getUserName = (userId) => {
+    //     const user = testDataUsers.find(u => u.id === userId);
+    //     return user ? user.name : "Unknown";
+    // };
 
     const getMessageStyle = (userId, currentUserId) => ({
         display: 'flex',
