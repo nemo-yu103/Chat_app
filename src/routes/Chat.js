@@ -26,10 +26,9 @@ const Chat = () => {
   ];
 
   const getMessages = async () => {
-    const asd = await fetch("http://localhost:5000/messages", {
-      method: "POST",
+    const asd = await fetch("http://localhost:5000/messages/1", {
+      method: "GET",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ text: "testteate", groupId: 1, userId: 1 }),
     });
     console.log(asd);
   };
