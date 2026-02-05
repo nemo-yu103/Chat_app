@@ -1,3 +1,5 @@
+import GroupSelector from "../components/groupSelector";
+
 const Chat = () => {
     const currentUserId = 1;
 
@@ -82,6 +84,7 @@ const Chat = () => {
         <div style={styles.container}>
             <h2 style={styles.header}>Chat Room</h2>
             <div style={{ marginTop: '20px' }}>
+                {/* <GroupSelector userid={1} /> */}
                 {testDataMessages.map((msg, index) => {
                     const isMe = msg.userid === currentUserId;
                     // const name = getUserName(msg.userid, testDataUsers);
