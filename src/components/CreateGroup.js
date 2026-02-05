@@ -5,12 +5,10 @@ const CreateGroup = ({ isOpen, onClose, userId }) => {
   const [availableUsers, setAvailableUsers] = useState([]);
   const [selectedUserIds, setSelectedUserIds] = useState([]);
   const [groupName, setGroupName] = useState("");
-  //   const [userData] = useContext(UserContext);
-  const userData = { id: 1 };
 
   useEffect(() => {
     (async () => {
-      const res = await fetch(`http://localhost:5000/users/${userData.id}`, {
+      const res = await fetch(`http://localhost:5000/users/${userId}`, {
         method: "GET",
         headers: { "Content-Type": "application/json" },
       });
@@ -18,11 +16,7 @@ const CreateGroup = ({ isOpen, onClose, userId }) => {
       const users = await res.json();
       setAvailableUsers(users);
     })();
-  }, [userData]);
-
-  //   const availableUsers = useMemo(() => {
-  //     if (Array.isArray(users) && users.length) return users;
-  //   }, [users]);
+  }, [userId]);
 
   const toggleUser = (id) => {
     setSelectedUserIds((prev) =>

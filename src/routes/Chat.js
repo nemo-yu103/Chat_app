@@ -4,36 +4,52 @@ import "./Chat.css";
 
 const Chat = () => {
   const [isCreateModalOpen, setIsCreateModalOpen] = useState(false);
+  const [user, setUser] = useState({ userId: null, username: "" });
   const [messages, setMessages] = useState([]);
   const [inputText, setInputText] = useState("");
 
-  const currentUserId = 1;
-
-  const testDataUsers = [
-    {
-      id: 1,
-      name: "nemoto"
-    },
-    {
-      id: 2,
-      name: "itou"
-    }
-  ];
-
-  const handleSendMessage = () => {
-    if (!inputText.trim()) return;
-
-    const newMessage = {
-      text: inputText,
-      userid: 1 // This represents you
-    };
-
-    setInputText("");
+  const getMessages = async (userId) => {
+    const res = await fetch(`http://localhost:5000/messages/${userId}`, {
+      method: "GET",
+      headers: { "Content-Type": "application/json" }
+    });
+    const json = await res.json();
+    return json;
   };
 
-  const getUserName = (userId) => {
-    const user = testDataUsers.find((u) => u.id === userId);
-    return user ? user.name : "Unknown";
+  const sendMessage = async (userId) => {
+    const res = await fetch(`http://localhost:5000/messages`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ text: inputText, groupId: 1, userId: userId })
+    });
+    const json = await res.json();
+    return json;
+  };
+
+  const deleteMessage = async (msgId) => {
+    const res = await fetch(`http://localhost:5000/messages/delete`, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ msgId })
+    });
+    const json = await res.json();
+    return json;
+  };
+
+  const handleSendMessage = async () => {
+    if (!inputText.trim()) return;
+
+    await sendMessage(user.userId);
+    const updatedMessages = await getMessages(user.userId);
+    setInputText("");
+    setMessages(updatedMessages);
+  };
+
+  const handleDeleteMessage = async (msgId) => {
+    await deleteMessage(msgId);
+    const updatedMessages = await getMessages(user.userId);
+    setMessages(updatedMessages);
   };
 
   const getMessageStyle = (userId, currentUserId) => ({
@@ -43,21 +59,20 @@ const Chat = () => {
     marginBottom: "10px"
   });
 
-  const getMessages = async () => {
-    const asd = await fetch("http://localhost:5000/messages/1", {
-      method: "GET",
-      headers: { "Content-Type": "application/json" }
-    });
-    return asd;
-  };
+  useEffect(() => {
+    if (!user.userId) return;
+    console.log("adasd");
+
+    (async () => {
+      const messages = await getMessages(user.userId);
+      setMessages(messages);
+    })();
+  }, [user]);
 
   useEffect(() => {
-    (async () => {
-      const res = await getMessages();
-      const data = await res.json();
-      setMessages(data);
-      console.log(data);
-    })();
+    const userData = localStorage.getItem("user");
+    const parsed = JSON.parse(userData);
+    setUser({ userId: parsed.userId, username: parsed.username });
   }, []);
 
   const styles = {
@@ -104,26 +119,60 @@ const Chat = () => {
   return (
     <>
       <div style={styles.container}>
+        <button onClick={() => setIsCreateModalOpen(true)} >新しいチャット</button>
         <h2 style={styles.header}>Chat Room</h2>
         <div style={{ marginTop: "20px" }}>
           {messages.map((msg, index) => {
-            const isMe = msg.userid === currentUserId;
+            const isMe = msg.userid === user.userId;
             return (
-              <div
-                key={index}
-                style={getMessageStyle(msg.userid, currentUserId)}
-              >
-                <span style={styles.userName}>{getUserName(msg.userid)}</span>
-                <div style={styles.bubble(isMe)}>{msg.text}</div>
+              <div key={index} style={getMessageStyle(msg.userid, user.userId)}>
+                <span
+                  style={{
+                    ...styles.userName,
+                    textAlign: isMe ? "right" : "left",
+                    display: "block"
+                  }}
+                >
+                  {msg.username} <br />
+                  {new Date(msg.created_at).toLocaleDateString("en-CA")}
+                </span>
+
+                <span style={styles.bubble(isMe)}>
+                  <div style={styles.messagesText}>{msg.text}</div>
+
+                  <div style={styles.time}>
+                    {new Date(msg.created_at).toLocaleTimeString([], {
+                      hour: "2-digit",
+                      minute: "2-digit"
+                    })}
+                  </div>
+                </span>
+
+                {msg.userid === user.userId && (
+                  <button onClick={() => handleDeleteMessage(msg.id)}>
+                    削除
+                  </button>
+                )}
               </div>
             );
           })}
+        </div>
+
+        <div className="input-section">
+          <input
+            type="text"
+            value={inputText}
+            onChange={(e) => setInputText(e.target.value)}
+            placeholder="メッセージを入力して..."
+          />
+          <button onClick={handleSendMessage}>送信</button>
         </div>
       </div>
 
       <CreateGroup
         isOpen={isCreateModalOpen}
         onClose={() => setIsCreateModalOpen(false)}
+        userId={user.userId}
       />
     </>
   );

@@ -7,7 +7,6 @@ const Login = () => {
     const [userename, setUsername] = useState("");
     const [password, setPassword] = useState("");
     const [error, setError] = useState("");
-    const [_, setUserData] = useContext(UserContext);
 
     const navigate = useNavigate();
 
@@ -26,7 +25,7 @@ const Login = () => {
                 body: JSON.stringify({ username: userename, password: password })
             });
 
-            //404や500などのエラーステータスの場合
+            // 404や500などのエラーステータスの場合
             if (!res.ok) {
                 setError("ユーザー名またはパスワードが正しくありません");
                 return;

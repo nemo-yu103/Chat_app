@@ -56,6 +56,14 @@ const postMessage = async (userId, groupId, text) => {
   return rows;
 };
 
+const deleteMessage = async (msgId) => {
+  const [rows] = await pool.execute(`
+        DELETE FROM messages
+        WHERE id = ${msgId}
+    `);
+  return rows;
+};
+
 const getUsers = async (userId) => {
   const [rows] = await pool.execute(`
         SELECT *
@@ -187,6 +195,19 @@ app.post("/groups", async (req, res) => {
     );
 
     return res.status(201).json({ groupId });
+  } catch (e) {
+    console.error(e);
+    return res.status(500).json({ error: "DB error" });
+  }
+});
+
+app.post("/messages/delete", async (req, res) => {
+  try {
+    const { msgId } = req.body;
+
+    await deleteMessage(msgId);
+
+    return res.status(200).json();
   } catch (e) {
     console.error(e);
     return res.status(500).json({ error: "DB error" });
