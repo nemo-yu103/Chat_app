@@ -26,8 +26,13 @@ const login = async (username, password) => {
 
 const getMessagesFromGroup = async (groupId) => {
   const [rows] = await pool.execute(`
-        SELECT * 
+        SELECT 
+          messages.*,
+          users.id AS userid,
+          users.name AS username
         FROM messages 
+        LEFT JOIN users
+          ON messages.userid = users.id
         WHERE messages.groupid = ${groupId}
     `);
   return rows;
